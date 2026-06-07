@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitaCheck Tracker - Smart Medicine Tracking & Expiry Notification System</title>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #14b8a6;
+            --primary-hover: #2dd4bf;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header & Theme Switcher */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+
+        /* Container & State Views */
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .view-card {
+            background: var(--bg-surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            display: none;
+        }
+
+        .view-card.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        .title-group {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title-group h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .title-group p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* UI Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.87rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Buttons & Action Items */
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .link-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .link-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Code Verification Input Layout */
+        .code-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: space-between;
+            margin: 1.5rem 0;
+        }
+
+        .code-container input {
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-main);
+            border-radius: 6px;
+        }
+
+        /* --- Dashboard Specific Styles (Full Width View) --- */
+        .dashboard-view {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .dash-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media(max-width: 768px) {
+            .dash-layout { grid-template-columns: 1fr; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media(max-width: 480px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card h3 { font-size: 1.5rem; color: var(--primary); }
+        .stat-card p { font-size: 0.8rem; color: var(--text-muted); }
+
+        .dash-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .med-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .badge-safe { background: #bbf7d0; color: #166534; }
+        .badge-warn { background: #fef08a; color: #854d0e; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>🛡️ VitaCheck Tracker</h1>
+        </div>
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    </header>
+
+    <div class="container">
+
+        <div class="view-card active" id="view-landing">
+            <div class="title-group">
+                <h2>VitaCheck Tracker</h2>
+                <p>Smart Medicine Tracking and Expiry Notification System</p>
+            </div>
+            <button class="btn btn-outline" onclick="showView('view-signup')">Sign Up</button>
+            <button class="btn" onclick="showView('view-login')">Login</button>
+        </div>
+
+        <div class="view-card" id="view-signup">
+            <div class="title-group">
+                <h2>Create Account</h2>
+                <p>Sign up to start tracking your medicines safely</p>
+            </div>
+            <form onsubmit="event.preventDefault(); showView('view-verification');">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Type of User</label>
+                    <select required>
+                        <option value="" disabled selected>Select user profile</option>
+                        <option value="personal">Personal Use</option>
+                        <option value="elderly">Elderly</option>
+                        <option value="caregiver">Caregiver</option>
+                        <option value="pharmacist">Pharmacist</option>
+                        <option value="others">Others</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">Done</button>
+            </form>
+            <div class="link-footer">
+                Already have an account? <a href="#" onclick="showView('view-login')">Login</a>
+            </div>
+        </div>
+
+        <div class="view-card" id="view-verification">
+            <div class="title-group" style="text-align: center;">
+                <span style="font-size: 3rem;">✉️</span>
+                <h2>Verify your email</h2>
+                <p>We sent a 6-digit verification code to your email address.</p>
+            </div>
+            <div class="code-container">
+                <input type="text" maxlength="1" value="2">
+                <input type="text" maxlength="1" value="4">
+                <input type="text" maxlength="1" value="8">
+                <input type="text" maxlength="1" value="6">
+                <input type="text" maxlength="1" value="1">
+                <input type="text" maxlength="1" value="3">
+            </div>
+            <button class="btn" onclick="showView('view-login')">Verify & Proceed to Login</button>
+        </div>
+
+        <div class="view-card" id="view-login">
+            <div class="title-group">
+                <h2>Welcome Back</h2>
+                <p>Login to your health dashboard</p>
+            </div>
+            <form onsubmit="event.preventDefault(); showView('view-dashboard');">
+                <div class="form-group">
+                    <label>Username or Email</label>
+                    <input type="text" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                    <a href="#" class="forgot-password-link" onclick="showView('view-forgot')">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div class="link-footer">
+                Don't have an account? <a href="#" onclick="showView('view-signup')">Sign Up</a>
+            </div>
+        </div>
+
+        <div class="view-card" id="view-forgot">
+            <div class="title-group">
+                <h2>Reset Password</h2>
+                <p>Enter your email and we'll send you a recovery link.</p>
+            </div>
+            <form onsubmit="event.preventDefault(); alert('Password reset verification code sent to your email.'); showView('view-login');">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="name@example.com" required>
+                </div>
+                <button type="submit" class="btn">Send Verification Link</button>
+            </form>
+            <div class="link-footer">
+                <a href="#" onclick="showView('view-login')">Back to Login</a>
+            </div>
+        </div>
+
+        <div class="view-card dashboard-view" id="view-dashboard">
+            <div class="title-group" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Health Dashboard</h2>
+                    <p>Welcome Back, User! Track and handle your prescriptions smoothly.</p>
+                </div>
+                <button class="btn" style="width: auto; padding: 0.5rem 1rem;" onclick="showView('view-landing')">Logout</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><h3>12</h3><p>Total Medicines</p></div>
+                <div class="stat-card"><h3>3</h3><p>Due Today</p></div>
+                <div class="stat-card"><h3>2</h3><p>Expiring Soon</p></div>
+                <div class="stat-card"><h3>1</h3><p>Expired</p></div>
+            </div>
+
+            <div class="dash-layout">
+                <div>
+                    <div class="dash-box">
+                        <h3 style="margin-bottom: 1rem;">Recent Medicines Tracking</h3>
+                        <div class="med-list-item">
+                            <div><strong>Metformin</strong> - 500mg <br><small style="color:var(--text-muted)">Time: 08:00 AM</small></div>
+                            <div><span class="badge badge-safe">Safe</span> <br><small style="color:var(--text-muted)">Exp: 01 Oct 2026</small></div>
+                        </div>
+                        <div class="med-list-item">
+                            <div><strong>Vitamin D3</strong> - 1000 IU <br><small style="color:var(--text-muted)">Time: 01:00 PM</small></div>
+                            <div><span class="badge badge-warn">Expiring Soon</span> <br><small style="color:var(--text-muted)">Exp: 15 May 2026</small></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="dash-box">
+                        <h3 style="margin-bottom: 1rem;">Add Medicine</h3>
+                        <form onsubmit="event.preventDefault(); alert('Medicine track configuration added securely!');">
+                            <div class="form-group">
+                                <label>Medicine Name</label>
+                                <input type="text" placeholder="e.g. Paracetamol" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Dosage</label>
+                                <input type="text" placeholder="e.g. 500mg" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="date" required>
+                            </div>
+                            <button type="submit" class="btn">Save Medicine</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // App View Engine Navigation Link Routing
+        function showView(viewId) {
+            // Hide all views
+            const cards = document.querySelectorAll('.view-card');
+            cards.forEach(card => card.classList.remove('active'));
+            
+            // Show requested view
+            const activeCard = document.getElementById(viewId);
+            if(activeCard) {
+                activeCard.classList.add('active');
+            }
+        }
+
+        // Theme Switcher Architecture Logic
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeBtn = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.innerHTML = '🌙 Dark Mode';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.innerHTML = '☀️ Light Mode';
+            }
+        }
+    </script>
+</body>
+</html>
