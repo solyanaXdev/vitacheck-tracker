@@ -1,27 +1,2 @@
-# vitacheck-tracker
-Smart Medicine Tracking and Expiry Notification System
-
-## Features
-
-- Email Verification
-- Secure Login
-- Forgot Password
-- Medicine Tracking
-- Expiry Alerts
-- Email Notifications
-- Pharmacy Dashboard
-- QR Code Medicine Registration
-- Dark Mode / Light Mode
-
-## Tech Stack
-
-### Frontend
-- HTML
-- CSS
-- JavaScript
-
-### Backend
-- Python
-- Flask
-- SQLite
-
+VitaCheck Tracker is a smart healthcare management platform designed to help users take control of their medications safely, efficiently, and confidently. Our mission is to improve medication adherence, reduce missed doses, and provide users with intelligent health support through modern technology and artificial intelligence.
+The platform combines medication tracking, automated reminders, AI-powered assistance, health analytics, and emergency preparedness tools into one secure and user-friendly system. Whether you are managing your own medications or helping a family member, VitaCheck Tracker provides the tools needed to stay organized and informed.
